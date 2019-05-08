@@ -97,7 +97,7 @@ public class GroupContainer {
         // Return the result set. 
         return results;
     }
-    
+
     protected HashSet<Coordinate> getSatisfiedCoords() {
         HashSet<Coordinate> results = new HashSet<>();
         Iterator<Coordinate> i = coords.iterator();
@@ -149,91 +149,59 @@ public class GroupContainer {
 
     /**
      * Gets all remaining numbers asside from the given number, and all
-     * remaining coordinates asside from the given coordinate, and simulates
-     * all combinations of those numbers in those coordinates. If exactly
-     * one simulation deems it possible for all number/coordinate combinations,
-     * returns true. Otherwise returns false. 
+     * remaining coordinates asside from the given coordinate, and simulates all
+     * combinations of those numbers in those coordinates. If exactly one
+     * simulation deems it possible for all number/coordinate combinations,
+     * returns true. Otherwise returns false.
      */
     protected boolean solveThroughSimulation(HashSet<Number> numbers, Coordinate coord, Number number) {
-        // Will only proceed if the number of remaining numbers is fewer than 5.
-        if (!(this.getRemainingNumbers(numbers).size() < 7)) {
-            return false;
-        }
-        // Perform a pre-simulation check to assure that the given number
-        // is definitely possible in the given coordinate. 
-        if (!coord.possible(number)) {
-            return false;
-        }
-        
-        
-        // Get remaining numbers and format as a List, then remove current number from the list.
+        // Validate state before attempting to solve.
+        if (!(this.getRemainingNumbers(numbers).size() < 9 || !coord.possible(number))) {
+            return false;}
+
+        // Get remaining numbers and coords formatted as 
+        // lists with coord and number removed.
         List<Number> nums = new ArrayList<>(getRemainingNumbers(numbers));
-        nums.remove(number);
-        
-        // Get blank coordinates in a sorted list, then remove current coord from the list.
         List<Coordinate> coordList = new ArrayList<>(getBlankCoords());
+        nums.remove(number);
         coordList.remove(coord);
-        
+
         // Get a list of all possible number sequences
-        TreeMap<Integer,TreeMap<Integer,Number>> sequences = new TreeMap<>();
-        getPossibleSequences(nums,sequences);
-        
+        TreeMap<Integer, TreeMap<Integer, Number>> sequences = new TreeMap<>();
+        getPossibleSequences(nums, sequences);
+
         // Count the number of 'perfect' sequences
         int perfectSequences = 0;
-        
+
         // Iterate over each sequence
-        Set<Integer> seqsKS = sequences.keySet();
-        
-        //////////////////// DEBUGGING ON       
-        if (Puzzle.debug) {
-                    System.out.println("-----------------------------------------");
-        System.out.println("Satisfied coordinates: ");
-        Iterator<Coordinate> it = getSatisfiedCoords().iterator();
-        while(it.hasNext()) {
-            Coordinate c = it.next();
-            System.out.println("(" + c.row.position + ", " + c.column.position +
-                    " == " + c.number.number + ")");
-        }
-        }
-        //////////////////// DEBUGGING OFF    
-        
-        for(int i : seqsKS) {
+        Set<Integer> seqsKS = sequences.keySet(); 
+        for (int i : seqsKS) {
             // Get a map containing each sequence, where the key contains the
             // sequential order, and the value contains the number in that position.
             TreeMap<Integer, Number> sequence = sequences.get(i);
-            
+
             // Count the number of possible sequences
             int numPossible = 0;
-            
+
             // Iterate over the sequence
             Set<Integer> seqKS = sequence.keySet();
-            
+
             //////////////////// DEBUGGING ON
-            if (Puzzle.debug) {
-                            // Debugging
-            System.out.println("");
-            System.out.print("Sequence: ");
-            for(int k : seqKS) {
-                System.out.print(sequence.get(k).number);
-            }
-            System.out.println();
-            System.out.println("------------------");
+            if (Puzzle.debug) {System.out.println("");
+                System.out.print("Sequence: ");
+                for (int k : seqKS) {System.out.print(sequence.get(k).number);
+                }System.out.println();System.out.println("------------------");
             }
             //////////////////// DEBUGGING OFF
-            
-            for(int k : seqKS) {
+
+            for (int k : seqKS) {
                 // Get the current number
                 Number n = sequence.get(k);
                 // Get the current coordinate
-                Coordinate c = coordList.get((k-1));
-//                try {
-//                    c = ;
-//                } catch (Exception ex) {
-//                    System.out.println(ex);
-//                }
+                Coordinate c = coordList.get((k - 1));
                 boolean possible = c.possible(n);
                 // If this is possible, increment numPossible
-                if(possible) {
+                if (possible) {
                     numPossible++;
                     //System.out.println(n.number + " possible.");
                 } else {
@@ -241,53 +209,46 @@ public class GroupContainer {
                 }
             }
             //////////////////// DEBUGGING ON
-            if (Puzzle.debug) {
-                            String posString = "";
-            if(seqKS.size() == numPossible) {
-                posString = "POSSIBLE";
-            } else {posString = "NOT POSSIBLE";}
-            System.out.println("=== Sequence: " + posString);
-            }
+            if (Puzzle.debug) {String posString = "";
+                if (seqKS.size() == numPossible) {posString = "POSSIBLE";
+                } else {posString = "NOT POSSIBLE";}
+                System.out.println("=== Sequence: " + posString);}
             //////////////////// DEBUGGING OFF
-            
-            
+
             // If numPossible is equal to the size of nums, increment perfectSequences
             if (numPossible == nums.size()) {
                 perfectSequences++;
             }
         }
-        if (coord.row.position == 1 && coord.row.position == 1) {
-            System.out.println("");
-        }
+
         return perfectSequences == 1;
     }
 
-
-
-    
     /**
      * Given a list of Number objects and a collection to inject the results,
      * gets a list of all possible sequences of the given numbers where all
-     * numbers occur exactly once. 
-     * @param numbers The numbers in the list of possible sequences. 
-     * @param result The collection to inject the results into. 
-     * @return 
+     * numbers occur exactly once.
+     *
+     * @param numbers The numbers in the list of possible sequences.
+     * @param result The collection to inject the results into.
+     * @return
      */
-    protected static TreeMap<Integer,TreeMap<Integer,Number>> 
-        getPossibleSequences(List<Number> numbers, 
-            TreeMap<Integer,TreeMap<Integer,Number>> result) {
-            return getSeqs(numbers, result, new TreeMap<>(), 1, new Number(-1));
-        }
+    protected static TreeMap<Integer, TreeMap<Integer, Number>>
+            getPossibleSequences(List<Number> numbers,
+                    TreeMap<Integer, TreeMap<Integer, Number>> result) {
+        return getSeqs(numbers, result, new TreeMap<>(), 1, new Number(-1));
+    }
+
     /**
      * This test method exists to try and figure out a way of embedding X number
      * of iterations within iterations.
      *
      * @return
      */
-    private static TreeMap<Integer,TreeMap<Integer,Number>> 
-        getSeqs(List<Number> numbers, 
-            TreeMap<Integer,TreeMap<Integer,Number>> result, 
-            TreeMap<Integer,Number> resultSet, int currentKey, Number lastNumber) {
+    private static TreeMap<Integer, TreeMap<Integer, Number>>
+            getSeqs(List<Number> numbers,
+                    TreeMap<Integer, TreeMap<Integer, Number>> result,
+                    TreeMap<Integer, Number> resultSet, int currentKey, Number lastNumber) {
         // Only iterate if there are still numbers remaining
         if (numbers.size() > 0) {
             // Iterate over every number in the 'numbers' collection
@@ -295,9 +256,10 @@ public class GroupContainer {
                 // Create a 'numbers' copy without 'number'
                 List<Number> numsToParse = new ArrayList<>();
                 numbers.stream().filter((n) -> (number != n)).forEachOrdered((n) -> {
-                    numsToParse.add(n);});
+                    numsToParse.add(n);
+                });
                 // Add 'number' to result set, then increment the key
-                resultSet.put(resultSet.size()+1, number);
+                resultSet.put(resultSet.size() + 1, number);
                 currentKey++;
                 // Recursively call this method
                 getSeqs(numsToParse, result, resultSet, currentKey, number);
@@ -312,7 +274,7 @@ public class GroupContainer {
             }
         } else {
             // Add resultSet to results
-            result.put(result.size() +1, new TreeMap<>(resultSet));
+            result.put(result.size() + 1, new TreeMap<>(resultSet));
         }
         return result;
     }
