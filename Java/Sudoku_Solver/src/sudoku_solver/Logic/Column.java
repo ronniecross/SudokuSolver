@@ -5,9 +5,6 @@
  */
 package sudoku_solver.Logic;
 
-import java.util.HashSet;
-import java.util.Iterator;
-
 /**
  *
  * @author cross
