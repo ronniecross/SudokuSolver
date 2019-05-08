@@ -97,18 +97,6 @@ public class GroupContainer {
         // Return the result set. 
         return results;
     }
-    
-    protected HashSet<Coordinate> getSatisfiedCoords() {
-        HashSet<Coordinate> results = new HashSet<>();
-        Iterator<Coordinate> i = coords.iterator();
-        while (i.hasNext()) {
-            Coordinate coord = i.next();
-            if (coord.number != null) {
-                results.add(coord);
-            }
-        }
-        return results;
-    }
 
     /**
      * Returns a collection of Number objects that have not been assigned to a
@@ -164,100 +152,47 @@ public class GroupContainer {
         if (!coord.possible(number)) {
             return false;
         }
-        
-        
-        // Get remaining numbers and format as a List, then remove current number from the list.
+        // Get all remaining numbers and format them as a List.
         List<Number> nums = new ArrayList<>(getRemainingNumbers(numbers));
+        // Remove the provided number from nums (that has already been checked!)
         nums.remove(number);
-        
-        // Get blank coordinates in a sorted list, then remove current coord from the list.
+        // Get a list of blank coordinates into a sorted list.
         List<Coordinate> coordList = new ArrayList<>(getBlankCoords());
+        // Remove the provided coordinate from coordList (that has already been checked!)
         coordList.remove(coord);
-        
         // Get a list of all possible number sequences
         TreeMap<Integer,TreeMap<Integer,Number>> sequences = new TreeMap<>();
         getPossibleSequences(nums,sequences);
-        
         // Count the number of 'perfect' sequences
         int perfectSequences = 0;
-        
         // Iterate over each sequence
         Set<Integer> seqsKS = sequences.keySet();
-        
-        //////////////////// DEBUGGING ON       
-        if (Puzzle.debug) {
-                    System.out.println("-----------------------------------------");
-        System.out.println("Satisfied coordinates: ");
-        Iterator<Coordinate> it = getSatisfiedCoords().iterator();
-        while(it.hasNext()) {
-            Coordinate c = it.next();
-            System.out.println("(" + c.row.position + ", " + c.column.position +
-                    " == " + c.number.number + ")");
-        }
-        }
-        //////////////////// DEBUGGING OFF    
-        
         for(int i : seqsKS) {
-            // Get a map containing each sequence, where the key contains the
-            // sequential order, and the value contains the number in that position.
             TreeMap<Integer, Number> sequence = sequences.get(i);
-            
             // Count the number of possible sequences
             int numPossible = 0;
-            
-            // Iterate over the sequence
+            // Iverate over the sequence
             Set<Integer> seqKS = sequence.keySet();
-            
-            //////////////////// DEBUGGING ON
-            if (Puzzle.debug) {
-                            // Debugging
-            System.out.println("");
-            System.out.print("Sequence: ");
-            for(int k : seqKS) {
-                System.out.print(sequence.get(k).number);
-            }
-            System.out.println();
-            System.out.println("------------------");
-            }
-            //////////////////// DEBUGGING OFF
-            
             for(int k : seqKS) {
                 // Get the current number
                 Number n = sequence.get(k);
                 // Get the current coordinate
-                Coordinate c = coordList.get((k-1));
-//                try {
-//                    c = ;
-//                } catch (Exception ex) {
-//                    System.out.println(ex);
-//                }
-                boolean possible = c.possible(n);
+                Coordinate c = null;
+                try {
+                    c = coordList.get((k-1));
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                }
+                
                 // If this is possible, increment numPossible
-                if(possible) {
+                if(c.possible(n)) {
                     numPossible++;
-                    //System.out.println(n.number + " possible.");
-                } else {
-                    //System.out.println(n.number + " not possible.");
                 }
             }
-            //////////////////// DEBUGGING ON
-            if (Puzzle.debug) {
-                            String posString = "";
-            if(seqKS.size() == numPossible) {
-                posString = "POSSIBLE";
-            } else {posString = "NOT POSSIBLE";}
-            System.out.println("=== Sequence: " + posString);
-            }
-            //////////////////// DEBUGGING OFF
-            
-            
             // If numPossible is equal to the size of nums, increment perfectSequences
             if (numPossible == nums.size()) {
                 perfectSequences++;
             }
-        }
-        if (coord.row.position == 1 && coord.row.position == 1) {
-            System.out.println("");
         }
         return perfectSequences == 1;
     }
