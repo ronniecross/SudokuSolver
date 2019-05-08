@@ -32,6 +32,7 @@ public class UI extends javax.swing.JFrame {
      * Creates new form UI
      */
     public UI() {
+        setWindowPosition();
         initComponents();
         formatTextAreas();
         tryChangeTabBehaviour();
@@ -48,6 +49,11 @@ public class UI extends javax.swing.JFrame {
         int sdXpos = ((uiXpos + uiWidth)/2)-(sdWidth/2);
         int sdYpos = ((uiYpos + uiHeight)/2)-(sdHeight/2);
         successDialog.setLocation(sdXpos, sdYpos);
+    }
+    
+    private void setWindowPosition() {
+        //this.setLocationRelativeTo(null);
+        
     }
     
     
@@ -264,7 +270,6 @@ public class UI extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         devMenu = new javax.swing.JMenu();
         initTestPuzzleMenuItem = new javax.swing.JMenuItem();
-        debugMenuItem = new javax.swing.JMenuItem();
         comingSoonMenu = new javax.swing.JMenu();
         autoGenMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
@@ -277,6 +282,7 @@ public class UI extends javax.swing.JFrame {
 
         jMenu1.setText("jMenu1");
 
+        successDialog.setMaximumSize(new java.awt.Dimension(200, 100));
         successDialog.setMinimumSize(new java.awt.Dimension(200, 100));
 
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -526,16 +532,6 @@ public class UI extends javax.swing.JFrame {
             }
         });
         devMenu.add(initTestPuzzleMenuItem);
-
-        debugMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
-        debugMenuItem.setMnemonic('D');
-        debugMenuItem.setText("Toggle Debug (enable)");
-        debugMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                debugMenuItemActionPerformed(evt);
-            }
-        });
-        devMenu.add(debugMenuItem);
 
         toolsMenu.add(devMenu);
 
@@ -941,17 +937,6 @@ public class UI extends javax.swing.JFrame {
         successDialog.setVisible(false);
     }//GEN-LAST:event_okButtonKeyPressed
 
-    private boolean debug = false;
-    private void debugMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugMenuItemActionPerformed
-        // TODO add your handling code here:
-        Puzzle.toggleDebug();
-        if (debug) {
-            debugMenuItem.setText("Toggle Debug (disable)");
-        } else {
-            debugMenuItem.setText("Toggle Debug (enable)");
-        }
-    }//GEN-LAST:event_debugMenuItemActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -1181,7 +1166,6 @@ public class UI extends javax.swing.JFrame {
     private javax.swing.JTextPane coord80;
     private javax.swing.JTextPane coord81;
     private javax.swing.JTextPane coord9;
-    private javax.swing.JMenuItem debugMenuItem;
     private javax.swing.JMenu devMenu;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenuItem initTestPuzzleMenuItem;

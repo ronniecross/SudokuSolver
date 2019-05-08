@@ -97,6 +97,7 @@ public class GroupContainer {
         // Return the result set. 
         return results;
     }
+<<<<<<< HEAD
 
     protected HashSet<Coordinate> getSatisfiedCoords() {
         HashSet<Coordinate> results = new HashSet<>();
@@ -109,6 +110,8 @@ public class GroupContainer {
         }
         return results;
     }
+=======
+>>>>>>> parent of a5044ba... Changes to simulation calculation
 
     /**
      * Returns a collection of Number objects that have not been assigned to a
@@ -155,6 +158,7 @@ public class GroupContainer {
      * returns true. Otherwise returns false.
      */
     protected boolean solveThroughSimulation(HashSet<Number> numbers, Coordinate coord, Number number) {
+<<<<<<< HEAD
         // Validate state before attempting to solve.
         if (!(this.getRemainingNumbers(numbers).size() < 9 || !coord.possible(number))) {
             return false;}
@@ -202,12 +206,55 @@ public class GroupContainer {
                 boolean possible = c.possible(n);
                 // If this is possible, increment numPossible
                 if (possible) {
+=======
+        // Will only proceed if the number of remaining numbers is fewer than 5.
+        if (!(this.getRemainingNumbers(numbers).size() < 7)) {
+            return false;
+        }
+        // Perform a pre-simulation check to assure that the given number
+        // is definitely possible in the given coordinate. 
+        if (!coord.possible(number)) {
+            return false;
+        }
+        // Get all remaining numbers and format them as a List.
+        List<Number> nums = new ArrayList<>(getRemainingNumbers(numbers));
+        // Remove the provided number from nums (that has already been checked!)
+        nums.remove(number);
+        // Get a list of blank coordinates into a sorted list.
+        List<Coordinate> coordList = new ArrayList<>(getBlankCoords());
+        // Remove the provided coordinate from coordList (that has already been checked!)
+        coordList.remove(coord);
+        // Get a list of all possible number sequences
+        TreeMap<Integer,TreeMap<Integer,Number>> sequences = new TreeMap<>();
+        getPossibleSequences(nums,sequences);
+        // Count the number of 'perfect' sequences
+        int perfectSequences = 0;
+        // Iterate over each sequence
+        Set<Integer> seqsKS = sequences.keySet();
+        for(int i : seqsKS) {
+            TreeMap<Integer, Number> sequence = sequences.get(i);
+            // Count the number of possible sequences
+            int numPossible = 0;
+            // Iverate over the sequence
+            Set<Integer> seqKS = sequence.keySet();
+            for(int k : seqKS) {
+                // Get the current number
+                Number n = sequence.get(k);
+                // Get the current coordinate
+                Coordinate c = null;
+                try {
+                    c = coordList.get((k-1));
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                }
+                
+                // If this is possible, increment numPossible
+                if(c.possible(n)) {
+>>>>>>> parent of a5044ba... Changes to simulation calculation
                     numPossible++;
-                    //System.out.println(n.number + " possible.");
-                } else {
-                    //System.out.println(n.number + " not possible.");
                 }
             }
+<<<<<<< HEAD
             //////////////////// DEBUGGING ON
             if (Puzzle.debug) {String posString = "";
                 if (seqKS.size() == numPossible) {posString = "POSSIBLE";
@@ -215,12 +262,17 @@ public class GroupContainer {
                 System.out.println("=== Sequence: " + posString);}
             //////////////////// DEBUGGING OFF
 
+=======
+>>>>>>> parent of a5044ba... Changes to simulation calculation
             // If numPossible is equal to the size of nums, increment perfectSequences
             if (numPossible == nums.size()) {
                 perfectSequences++;
             }
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of a5044ba... Changes to simulation calculation
         return perfectSequences == 1;
     }
 
