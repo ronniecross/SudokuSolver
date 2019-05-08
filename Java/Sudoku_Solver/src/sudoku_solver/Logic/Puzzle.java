@@ -28,6 +28,7 @@ public class Puzzle {
     HashMap<Integer, Square> squares;
     HashMap<Integer, Number> numbers;
     HashMap<Integer, Coordinate> coords;
+    protected static boolean debug = false;
 
     public Puzzle(HashMap<Integer, Integer> mappings) {
         initialize(mappings);
@@ -122,10 +123,11 @@ public class Puzzle {
                         )
                 );
             } catch (Exception ex) {
-                System.out.println("Row: " + row + ", Column: " + column
+                if (debug) {
+                    System.out.println("Row: " + row + ", Column: " + column
                         + ", Square: " + square + " failed.");
+                }
             }
-
         }
 
         // Get a set of keys from Mappings
@@ -146,7 +148,7 @@ public class Puzzle {
      * @return Returns true if the coordinate was resolved, otherwise returns
      * false.
      */
-    protected boolean resolve(Coordinate coord) {
+    protected boolean resolve(Coordinate coord, boolean trySim) {
         // Declare and initialize a boolean to identify whether or not the
         // coordinate has been resolved. 
         Boolean resolved = false;
@@ -163,7 +165,7 @@ public class Puzzle {
             Number number = numbers.get(numInt);
             // Attempt to resolve the co-ordinate, and assign the success to
             // resolved. 
-            resolved = coord.isNumber(number, numbersHS);
+            resolved = coord.isNumber(number, numbersHS, trySim);
             // If not resolved, try to resolve using square solve
 //            if (!resolved) {
 //                Square square = coord.square;
@@ -173,6 +175,12 @@ public class Puzzle {
             if (resolved) {
                 // Assign this number to this coordinate
                 coord.putNumber(number);
+//                String debug = "Row: " + coord.row.position + " Col: " + coord.column.position +
+//                        " Number: " + number.number;
+//                System.out.println(debug);
+//                if (number.number == 8) {
+//                    System.out.println(debug);
+//                }
             }
             //increment numInt
             numInt++;
@@ -194,6 +202,7 @@ public class Puzzle {
         // are resolved. 
         // Initialize this to false.
         Boolean failedIteration = false;
+        Boolean trySim = false;
         // Get the number of unassigned coordinates
         int unassigned = countUnassignedCoordinates();
         // Keep iterating over co-ordinates until either there has been a
@@ -213,7 +222,7 @@ public class Puzzle {
                 if (!assigned) {
                     // Attempt to resolve the coordinate, and assign the outcome
                     // to resolveResult.
-                    resolveResult = resolve(coord);
+                    resolveResult = resolve(coord, trySim);
                 }
                 // If the coordinate was resolved,
                 if (resolveResult) {
@@ -228,9 +237,18 @@ public class Puzzle {
             }
             // If no changes were observed, update failedIteration.
             if (!changeTracker) {
-                failedIteration = true;
-                System.out.println("Coords size = " + coords.size()
+                if (!trySim) {
+                    trySim = true;
+                } else {
+                    failedIteration = true;
+                }
+                if (debug) {
+                    System.out.println("Coords size = " + coords.size()
                 + ", results size = " + results.size());
+                }
+            }
+            else {
+                trySim = false;
             }
         }
         // return results set.
@@ -283,13 +301,7 @@ public class Puzzle {
         return counter;
     }
 
-    
-    /**
-     * Seeds an empty puzzle ready for solving
-     */
-    public void seed() {
 
-    }
     
     public void testSimulation() {
         List<Number> numList = new ArrayList<>();
@@ -305,8 +317,10 @@ public class Puzzle {
             SortedSet<Integer> resultKeys = (SortedSet<Integer>) results.keySet();
             for (int rKey : resultKeys) {
                 TreeMap<Integer, Number> resSet = results.get(rKey);
-                System.out.println();
+                if (debug) {
+                    System.out.println();
                 System.out.print("Collection: ");
+                }
                 // Iterate each result set
                 SortedSet<Integer> rsKeys = (SortedSet<Integer>) resSet.keySet();
                 for (int rsKey : rsKeys) {
@@ -314,6 +328,14 @@ public class Puzzle {
                     System.out.print(num.number + ",");
                 }
             }
+    }
+    
+    public static void toggleDebug() {
+        if (debug) {
+            debug = false;
+        } else {
+            debug = true;
+        }
     }
     
     /**
