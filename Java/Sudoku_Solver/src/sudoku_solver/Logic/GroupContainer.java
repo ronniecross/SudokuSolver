@@ -316,4 +316,90 @@ public class GroupContainer {
         }
         return result;
     }
+        
+        protected Number trySim(Coordinate coord) {
+            // This method will get all possible sequences in this container,
+            // and for each sequence, will verify that every number in a given
+            // position is possible in the corresponding coordinate in the
+            // same position within the container. 
+            // If all numbers in a sequence are possible, the sequence is stored
+            // in memory, and along with that, the number of sequences where
+            // all numbers are possible.
+            // If, at the end, there is exactly one possible sequence, the number
+            // within that sequence at the position corresponding to this position
+            // of the given coordinate is returned. 
+            
+            // Declarations
+            HashSet<Number> numbers = new HashSet<>();
+            HashSet<Coordinate> coordsSet = getBlankCoords();
+            TreeMap<Integer, Number> perfectSequence = new TreeMap<>();
+            int perfectSequenceCount = 0;
+            Number result = null;
+            
+            // Get remaining numbers
+            HashSet<Number> allNumbers = new HashSet<>();
+            Set<Integer> numKeys = Puzzle.numbers.keySet();
+            for(int i : numKeys) {
+                allNumbers.add(Puzzle.numbers.get(i));
+            }
+            numbers = getRemainingNumbers(allNumbers);
+            
+            // Get possible sequences
+            List<Number> numArray = new ArrayList<>();
+            for(Number n : numbers) {numArray.add(n);}
+            TreeMap<Integer, TreeMap<Integer, Number>> sequences = new TreeMap<>();
+            getPossibleSequences(numArray, sequences);
+            
+            // Convert coords to a HashMap
+            HashMap<Integer, Coordinate> coords = new HashMap<>();
+            int coordKey = 1;
+            for(Coordinate c : coordsSet) {
+                coords.put(coordKey, c);
+                coordKey++;
+            }
+            
+            // Iterate over each possible sequence
+            Set<Integer> sequenceKeys = sequences.keySet();
+            for(int key : sequenceKeys) {
+                // Get the active sequence
+                TreeMap<Integer, Number> sequence = sequences.get(key);
+                // Boolean to change to false if no longer perfect
+                Boolean isPerfect = true;
+                // Iterate over each coordinate
+                Set<Integer> coordKeys = coords.keySet();
+                for (int i : coordKeys) {
+                    // If it is not possible for this number to go into this coord
+                    Coordinate c = coords.get(i);
+                    Number n = sequence.get(i);
+                    int Row = c.row.position;
+                    int col = c.column.position;
+                    if(!c.possible(n)) {
+                        isPerfect = false;
+                    }
+                }
+                // If this is a perfect sequence, increment perfectSequenceCount
+                // and assign perfectSequence
+                if(isPerfect) {
+                    perfectSequenceCount++;
+                    perfectSequence = sequence;
+                }
+            }
+            if(perfectSequenceCount >= 1) {
+                System.out.println("Position: " + this.position + " "
+                        + perfectSequenceCount + " perfect sequences.");
+                System.out.println();
+            }
+            // If there is only one perfect sequence, return the number at the 
+            // position of coord within that sequence. Otherwise return null.
+            if(perfectSequenceCount == 1) {
+                
+                Set<Integer> coordKeys = coords.keySet();
+                for (int i : coordKeys) {
+                    if (coords.get(i) == coord) {
+                        result = perfectSequence.get(i);
+                    } 
+                }
+            }
+            return result;
+        }
 }

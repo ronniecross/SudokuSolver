@@ -854,7 +854,7 @@ public class UI extends javax.swing.JFrame {
         // Declare and initialize a puzzle
         puzzle = new Puzzle(makeMappings());
         // Attempt to solve the puzzle
-        HashMap<Integer, Integer> results = puzzle.solve();
+        HashMap<Integer, Integer> results = puzzle.solve_test();
         // Get the success as a boolean value
         Boolean success = (puzzle.countUnassignedCoordinates() == 0);
         // Set the value of each field to the values from the result hashmap

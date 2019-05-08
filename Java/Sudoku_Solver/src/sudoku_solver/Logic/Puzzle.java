@@ -26,7 +26,7 @@ public class Puzzle {
     HashMap<Integer, Row> rows;
     HashMap<Integer, Column> columns;
     HashMap<Integer, Square> squares;
-    HashMap<Integer, Number> numbers;
+    static HashMap<Integer, Number> numbers;
     HashMap<Integer, Coordinate> coords;
     protected static boolean debug = false;
 
@@ -248,6 +248,84 @@ public class Puzzle {
         }
         // When iterating stops, return results set.
         return results;
+    }
+    
+    
+        /**
+     * In this test, I will attempt to simulate directly from solve, rather
+     * than through the resolve method, meaning I can bypass the requirement
+     * to work with a specific number. 
+     */
+    public HashMap<Integer, Integer> solve_test() {
+        // HashMap to store the results.
+        HashMap<Integer, Integer> results = new HashMap<>();
+        // Variable identifying iteration with no solved co-ordinates.
+        Boolean failedIteration = false;
+        // Variable identifying whether simulation will be trued.
+        Boolean trySim = false;
+        // Number of unassigned coordinates
+        int unassigned = countUnassignedCoordinates();
+        // Iterate co-ordinates until failed iteration, or all resolved.
+        while (!failedIteration && results.size() != unassigned) {
+            // Tracker to see if any changes have been made
+            Boolean changeTracker = false;
+            // Iterate over coordinates
+            for (int i = 1; i <= coords.size(); i++) {
+                // Get the current coordinate
+                Coordinate coord = coords.get(i);
+                // Check to see if coordinate is already assigned.
+                boolean assigned = (coord.number != null);
+                // Variable storing success of resolve attempts
+                Boolean resolveResult = false;
+                // If the coordinate is not already assigned, 
+                if (!assigned) {
+                    // Assign attempt to resolve coordinate to resolveResult
+                    resolveResult = resolve(coord, trySim);
+                }
+                // If the coordinate was resolved, add it to the results.
+                if (resolveResult) {
+                    results.put(i, coord.number.number);
+                    // If no change had previously been observed, update change tracker.
+                    if (!changeTracker) {
+                        changeTracker = true;
+                    }}}
+            
+            // If there were no changes
+            if (!changeTracker) {
+                // Try simulation
+                Boolean trySimResult = false;
+                // Iterate each coordinate
+                Set<Integer> coordKS = coords.keySet();
+                for(Integer key : coordKS) {
+                    // Make sure the coordinate is not already assigned
+                    Coordinate coord = coords.get(key);
+                    if (coord.number == null) {
+                        // Get the result of trySim()
+                        Number number = coords.get(key).trySim();
+                        number = null;
+                        // If the simulation was successful,
+                        if (number != null) {
+                            // Put the number into the results
+                            results.put(key, number.number);
+                            // update trySimResult
+                            trySimResult = true;
+                        }
+                    }
+                }
+                // If simulation did not resolve any coordinates, fail this iteration.
+                if (!trySimResult) {
+                    failedIteration = true;
+                }
+            }
+        }
+        // When iterating stops, return results set.
+        return results;
+    }
+    
+    private Number trySim(Coordinate coord) {
+        // Call coord.simSolve() which will return either null
+        // or the number belonging in that coordinate.
+        return null;
     }
     
     /**

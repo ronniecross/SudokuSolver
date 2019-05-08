@@ -78,15 +78,15 @@ public class Coordinate {
                     result = true;
                     resolveMethod = "SQUARE_SOLVE";
                 } else if (trySim) {
-                    // Try simulation
-                    boolean simSuccess = solveThroughSim(number, numbers);
-                    // Otherwise return false. 
-                    if (simSuccess) {
-                        result = true;
-                        resolveMethod = "SIMULATION";
-                    } else {
-                        return false;
-                    }
+//                    // Try simulation
+//                    boolean simSuccess = solveThroughSim(number, numbers);
+//                    // Otherwise return false. 
+//                    if (simSuccess) {
+//                        result = true;
+//                        resolveMethod = "SIMULATION";
+//                    } else {
+//                        return false;
+//                    }
                 }
             }
         }
@@ -292,5 +292,16 @@ public class Coordinate {
     protected Boolean reset() {
         number = null;
         return number == null;
+    }
+    
+    protected Number trySim() {
+        Number result = row.trySim(this);
+        if (result == null) {
+            result = column.trySim(this);
+        }
+        if (result == null) {
+            result = square.trySim(this);
+        }
+        return result;
     }
 }

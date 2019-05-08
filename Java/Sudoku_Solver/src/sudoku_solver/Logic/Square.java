@@ -5,9 +5,11 @@
  */
 package sudoku_solver.Logic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  *
@@ -43,12 +45,42 @@ public class Square extends GroupContainer {
         // that are not the row/and or column which this coordinate occupies
         // contains the given number, then it can be concluded that this number
         // belongs in this coordinate. 
+        //
+        // If one one of rowCheck or columnCheck returns 2, then for the 
+        // respective check, if either of the other coordinates in the same
+        // row or column (respectively) that occupy the same square is not
+        // assigned a number, 'possible' is checked on that coordinate. If
+        // none of those coordinates return true, then true is returned. 
+        boolean result = false;
+        boolean isUnique = true;
         int rowCount = rowCheck(rows, coord, number);
         int colCount = columnCheck(columns, coord, number);
         if (rowCount == 2 && colCount == 2) {
-            return true;
+            result = true;
         }
-        return false;
+        if ((rowCount == 2 || colCount == 2) && !(rowCount == 2 && colCount == 2)) {
+            List<Coordinate> coords = new ArrayList<>();
+            GroupContainer gc = null;
+            if (rowCount == 2) {
+                gc = coord.row;
+            } else {
+                gc = coord.column;
+            }
+            for(Coordinate c : gc.coords) {
+                if (!(c == coord) && c.number != null && (c.square == coord.square)) {
+                    coords.add(c);
+                }
+            }
+            for(Coordinate c : coords) {
+                if (c.possible(number)) {
+                    isUnique = false;
+                }
+            }
+            if(isUnique) {
+                result = true;
+            }
+        }
+        return result;
     }
 
     /**
