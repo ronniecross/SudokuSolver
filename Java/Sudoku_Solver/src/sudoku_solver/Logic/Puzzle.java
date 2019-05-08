@@ -139,6 +139,20 @@ public class Puzzle {
             coord.putNumber(number);
         }
     }
+    
+    /**
+     * Returns a collection of unassigned coordinates.
+     */
+    public HashMap<Integer, Coordinate> getUnassignedCoords() {
+        HashMap<Integer, Coordinate> result = new HashMap<>();
+        Set<Integer> keys = coords.keySet();
+        for(Integer k : keys) {
+            if(coords.get(k).number == null) {
+                result.put(k, coords.get(k));
+            }
+        }
+        return result;
+    }
 
     /**
      * Attempts to resolve the given coordinate, and returns a true or false
@@ -149,8 +163,7 @@ public class Puzzle {
      * false.
      */
     protected boolean resolve(Coordinate coord, boolean trySim) {
-        // Declare and initialize a boolean to identify whether or not the
-        // coordinate has been resolved. 
+        // Boolean to determine if coordinate has been resolved. 
         Boolean resolved = false;
         // Declare an integer to represent numbers through iteration.
         int numInt = 1;
@@ -167,27 +180,17 @@ public class Puzzle {
             // resolved. 
             resolved = coord.isNumber(number, numbersHS, trySim);
             // If not resolved, try to resolve using square solve
-//            if (!resolved) {
-//                Square square = coord.square;
-//                resolved = square.trySolve(coord, number);
-//            }
             // If the coordinate is resolved to this number,
             if (resolved) {
                 // Assign this number to this coordinate
                 coord.putNumber(number);
-//                String debug = "Row: " + coord.row.position + " Col: " + coord.column.position +
-//                        " Number: " + number.number;
-//                System.out.println(debug);
-//                if (number.number == 8) {
-//                    System.out.println(debug);
-//                }
             }
             //increment numInt
             numInt++;
         }
         return resolved;
     }
-
+    
     /**
      * Attempts to solve the puzzle, and returns a collection containing all
      * resolved coordinates and the number corresponding to the coordinates.
@@ -195,63 +198,55 @@ public class Puzzle {
      * @return A HashMap containing the coordinates and numbers.
      */
     public HashMap<Integer, Integer> solve() {
-        //Declare a new HashMap to store the results.
+        // HashMap to store the results.
         HashMap<Integer, Integer> results = new HashMap<>();
-        // Declare a variable to identify a failed iteration.
-        // Note: a failed iteration is an iteration where no co-ordinates
-        // are resolved. 
-        // Initialize this to false.
+        // Variable identifying iteration with no solved co-ordinates.
         Boolean failedIteration = false;
+        // Variable identifying whether simulation will be trued.
         Boolean trySim = false;
-        // Get the number of unassigned coordinates
+        // Number of unassigned coordinates
         int unassigned = countUnassignedCoordinates();
-        // Keep iterating over co-ordinates until either there has been a
-        // failed iteration, or all co-ordinates have been resolved.
+        // Iterate co-ordinates until failed iteration, or all resolved.
         while (!failedIteration && results.size() != unassigned) {
-            // Declare a tracker to see if any changes have been made
+            // Tracker to see if any changes have been made
             Boolean changeTracker = false;
+            // Iterate over coordinates
             for (int i = 1; i <= coords.size(); i++) {
                 // Get the current coordinate
                 Coordinate coord = coords.get(i);
                 // Check to see if coordinate is already assigned.
                 boolean assigned = (coord.number != null);
-                // Declare a variable to store whether the coordinate was
-                // successfully resolved or not.
+                // Variable storing success of resolve attempts
                 Boolean resolveResult = false;
                 // If the coordinate is not already assigned, 
                 if (!assigned) {
-                    // Attempt to resolve the coordinate, and assign the outcome
-                    // to resolveResult.
+                    // Assign attempt to resolve coordinate to resolveResult
                     resolveResult = resolve(coord, trySim);
                 }
-                // If the coordinate was resolved,
+                // If the coordinate was resolved, add it to the results.
                 if (resolveResult) {
-                    // Add it to the results collection.
                     results.put(i, coord.number.number);
-                    // If no change had previously been observed,
+                    // If no change had previously been observed, update change tracker.
                     if (!changeTracker) {
-                        // Update change tracker.
                         changeTracker = true;
-                    }
-                }
-            }
-            // If no changes were observed, update failedIteration.
+                    }}}
+            // If no changes were observed, update failedIteration and, if
+            // applicable, trySim.
             if (!changeTracker) {
                 if (!trySim) {
                     trySim = true;
+                    // If simulation was attempted and there were still no
+                    // changes, consider this a failed iteration. 
                 } else {
                     failedIteration = true;
                 }
-                if (debug) {
-                    System.out.println("Coords size = " + coords.size()
-                + ", results size = " + results.size());
-                }
             }
             else {
+                // If changes were observed, make sure trySim is false.
                 trySim = false;
             }
         }
-        // return results set.
+        // When iterating stops, return results set.
         return results;
     }
     
