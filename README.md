@@ -1,2 +1,2 @@
 # SudokuSolver
-This is an unfinished (although working) mini-project to create a Sudoku solver. 
+This is an unfinished (although somewhat working) mini-project to create a Sudoku solver. 
