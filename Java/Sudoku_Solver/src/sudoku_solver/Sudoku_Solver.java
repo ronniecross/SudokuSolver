@@ -58,7 +58,7 @@ public class Sudoku_Solver {
             mappings.put(80,8);
             Puzzle puzzle = new Puzzle(mappings);
         try {
-
+            System.out.println(puzzle.solve());
         } catch (Exception ex) {
             System.out.println(ex);
         }
